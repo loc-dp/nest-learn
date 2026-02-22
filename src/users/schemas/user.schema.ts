@@ -23,11 +23,16 @@ export class User {
   @Prop()
   address!: string;
 
-  @Prop()
-  createAt!: string;
+  @Prop({ type: Boolean, default: false })
+  isDeleted!: boolean;
 
-  @Prop()
-  updateAt!: string;
+  @Prop({ type: Date, default: null })
+  deletedAt!: Date | null;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+// Pre hook: tự động lọc bỏ các document đã bị soft delete trong mọi query find
+UserSchema.pre(/^find/, async function (this: any) {
+  this.find({ isDeleted: { $ne: true } });
+});

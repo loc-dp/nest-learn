@@ -30,7 +30,7 @@ export class UsersService {
   }
 
   findAll() {
-    return `This action returns all users`;
+    return this.userModel.find();
   }
 
   findOne(id: string) {
@@ -49,7 +49,11 @@ export class UsersService {
     return await this.userModel.updateOne({ _id: id }, { ...updateUserDto });
   }
 
-  remove(id: string) {
-    return this.userModel.deleteOne({ _id: id });
+  async remove(id: string) {
+    // Soft delete: đánh dấu isDeleted thay vì xóa thật
+    return await this.userModel.updateOne(
+      { _id: id },
+      { isDeleted: true, deletedAt: new Date() },
+    );
   }
 }
