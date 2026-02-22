@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { genSaltSync, hashSync } from 'bcryptjs';
+import { genSaltSync, hashSync, compareSync } from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -33,16 +33,23 @@ export class UsersService {
     return `This action returns all users`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: string) {
+    return this.userModel.findById(id);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  findOneByUser(username: string) {
+    return this.userModel.findOne({ email: username });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  isValidPassword(password: string, hashPassword: string): boolean {
+    return compareSync(password, hashPassword);
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    return await this.userModel.updateOne({ _id: id }, { ...updateUserDto });
+  }
+
+  remove(id: string) {
+    return this.userModel.deleteOne({ _id: id });
   }
 }
