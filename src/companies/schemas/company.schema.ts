@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
-import mongoose from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export type CompanyDocument = HydratedDocument<Company>;
 
@@ -14,19 +13,19 @@ export class Company {
 
   @Prop({ type: Object })
   createdBy!: {
-    _id: mongoose.Schema.Types.ObjectId;
+    _id: Types.ObjectId;
     email: string;
   };
 
   @Prop({ type: Object })
   deletedBy!: {
-    _id: mongoose.Schema.Types.ObjectId;
+    _id: Types.ObjectId;
     email: string;
   };
 
   @Prop({ type: Object })
   updatedBy!: {
-    _id: mongoose.Schema.Types.ObjectId;
+    _id: Types.ObjectId;
     email: string;
   };
 

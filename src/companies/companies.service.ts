@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Company } from './schemas/company.schema';
 import { InjectModel } from '@nestjs/mongoose';
+import type { IUser } from 'src/users/users.interface';
 
 @Injectable()
 export class CompaniesService {
@@ -12,8 +13,14 @@ export class CompaniesService {
     private companyModel: Model<Company>,
   ) {}
 
-  create(createCompanyDto: CreateCompanyDto) {
-    return this.companyModel.create({ ...createCompanyDto });
+  create(createCompanyDto: CreateCompanyDto, user: IUser) {
+    return this.companyModel.create({
+      ...createCompanyDto,
+      createdBy: {
+        _id: new Types.ObjectId(user._id),
+        email: user.email,
+      },
+    });
   }
 
   findAll() {
