@@ -11,7 +11,7 @@ async function bootstrap() {
   const port = configService.get<number>('PORT') ?? 8000;
   const reflector = app.get(Reflector);
 
-  app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalInterceptors(new TransformInterceptor(reflector));
   app.useGlobalGuards(new JwtAuthGuard(reflector));
   app.enableCors({
     origin: 'localhost:3000',
@@ -19,7 +19,7 @@ async function bootstrap() {
     preflightContinue: false,
     optionsSuccessStatus: 204,
   });
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   await app.listen(port);
 }
