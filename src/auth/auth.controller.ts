@@ -9,9 +9,11 @@ import {
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Public, ResponseMessage } from 'src/decorator/customize';
+import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { LocalAuthGuard } from './local-auth.guard';
 import { RegisterUserDto } from 'src/users/dto/create-user.dto';
+import type { IUser } from 'src/users/users.interface';
+import type { Request as ExpressRequest } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -36,5 +38,19 @@ export class AuthController {
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @ResponseMessage("Get user's info successfully")
+  @Get('/account')
+  handleGetAccount(@User() user: IUser) {
+    return { user };
+  }
+
+  @Public()
+  @ResponseMessage('Refresh token successfully')
+  @Get('/refresh')
+  handleRefreshToken(@Req() req: ExpressRequest) {
+    const refreshToken = req.cookies['refresh_token'];
+    return this.authService.processNewToken(refreshToken);
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { IUser } from 'src/users/users.interface';
@@ -71,7 +71,7 @@ export class AuthService {
     };
   }
 
-  createrRefreshToken(payload) {
+  createrRefreshToken = (payload) => {
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>(
         'JWT_REFRESH_TOKEN_SECRET',
@@ -82,5 +82,18 @@ export class AuthService {
         ) / 1000,
     });
     return refreshToken;
+  }
+
+  processNewToken = (refreshToken: string) => {
+    try{
+      this.jwtService.verify(refreshToken, {
+        secret: this.configService.get<string>(
+          'JWT_REFRESH_TOKEN_SECRET'
+        ) as string,
+      });
+    }
+    catch (error) {
+      throw new BadRequestException('Invalid refresh token please login again');
+    }
   }
 }
