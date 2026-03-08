@@ -5,6 +5,8 @@ import {
   UseGuards,
   Request,
   Body,
+  Req,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public, ResponseMessage } from 'src/decorator/customize';
@@ -15,12 +17,12 @@ import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Public() // Để chặn kiểm tra JWT Guard
+  @Public() // Để bypass   kiểm tra JWT Guard
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   @ResponseMessage('Login successful')
-  handleLogin(@Request() req): any {
-    return this.authService.login(req.user);
+  handleLogin(@Req() req, @Res({ passthrough: true }) response: Response) {
+    return this.authService.login(req.user, response as any);
   }
 
   @Public()
