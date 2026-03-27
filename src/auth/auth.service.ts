@@ -71,6 +71,17 @@ export class AuthService {
     };
   }
 
+  async logout(req, response: Response) {
+    const refreshToken = req.cookies['refresh_token'];
+    if (!refreshToken) {
+      throw new BadRequestException('No refresh token found');
+    }
+    refreshToken &&
+      (await this.usersService.updateUserToken('', req.user._id.toString()));
+    response.clearCookie('refresh_token');
+    return 'ok';
+  }
+
   createrRefreshToken = (payload) => {
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>(
@@ -82,18 +93,17 @@ export class AuthService {
         ) / 1000,
     });
     return refreshToken;
-  }
+  };
 
   processNewToken = (refreshToken: string) => {
-    try{
+    try {
       this.jwtService.verify(refreshToken, {
         secret: this.configService.get<string>(
-          'JWT_REFRESH_TOKEN_SECRET'
+          'JWT_REFRESH_TOKEN_SECRET',
         ) as string,
       });
-    }
-    catch (error) {
+    } catch (error) {
       throw new BadRequestException('Invalid refresh token please login again');
     }
-  }
+  };
 }

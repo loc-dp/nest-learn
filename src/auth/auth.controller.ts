@@ -7,6 +7,7 @@ import {
   Body,
   Req,
   Res,
+  HttpCode,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
@@ -52,5 +53,14 @@ export class AuthController {
   handleRefreshToken(@Req() req: ExpressRequest) {
     const refreshToken = req.cookies['refresh_token'];
     return this.authService.processNewToken(refreshToken);
+  }
+
+  @Post('/logout')
+  @ResponseMessage('Logout User')
+  handleLogout(
+    @Req() req: ExpressRequest,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return this.authService.logout(req, response as any);
   }
 }
